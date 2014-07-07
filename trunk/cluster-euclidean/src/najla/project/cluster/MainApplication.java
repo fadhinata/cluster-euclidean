@@ -4,14 +4,13 @@
  */
 package najla.project.cluster;
 
-import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 import najla.project.cluster.view.MainDialog;
 
 /**
  *
- * @author Ideapad
+ * @author Matt
  */
 public class MainApplication {
     

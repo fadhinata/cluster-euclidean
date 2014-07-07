@@ -27,7 +27,7 @@ import najla.project.cluster.core.Configuration;
 
 /**
  *
- * @author Ideapad
+ * @author Matt
  */
 public class MainDialog extends JDialog implements ActionListener {
     

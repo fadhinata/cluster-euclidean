@@ -6,7 +6,7 @@ package najla.project.cluster.core;
 
 /**
  *
- * @author Ideapad
+ * @author Matt
  */
 public class Configuration {
     
