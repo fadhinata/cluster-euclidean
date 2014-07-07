@@ -141,7 +141,7 @@ public class MainFrame extends JFrame implements ActionListener {
                     String val = ((JTextField) comp).getText();
                     if (val == null || "".equals(val)) {
                         JOptionPane.showMessageDialog(null, "Value can't be empty");
-                        break;
+                        return;
                     }
                     inputValues.add(val);
                 }
