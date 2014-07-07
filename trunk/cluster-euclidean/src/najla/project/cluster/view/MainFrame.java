@@ -40,7 +40,7 @@ public class MainFrame extends JFrame implements ActionListener {
     private Question[] questions;
     
 	public MainFrame(int numOfStudents, int numOfQuestions) {
-		super("Cluster");
+		super("Cluster Application");
 		setSize(640, 480);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		initComponents(numOfStudents, numOfQuestions);
@@ -116,11 +116,11 @@ public class MainFrame extends JFrame implements ActionListener {
         
 		JScrollPane scrollpane = new JScrollPane(panel);
         
-        JPanel panelScores = new JPanel();
+        JPanel panelSummary = new JPanel();
         
         JTabbedPane tabs = new JTabbedPane();
         tabs.add(scrollpane, "Student Grades");
-        tabs.add(panelScores, "Scores");
+        tabs.add(panelSummary, "Summary");
         
 		getContentPane().add(tabs, BorderLayout.CENTER);
 	}

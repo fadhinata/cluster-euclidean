@@ -41,7 +41,6 @@ public class MainDialog extends JDialog implements ActionListener {
         this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         this.setSize(300, 150);
         this.setResizable(false);
-        this.setTitle("Cluster Application");
         this.addWindowListener(new WindowAdapter() {
 
             @Override
