@@ -10,6 +10,8 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyAdapter;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.JButton;
@@ -69,12 +71,39 @@ public class PanelTabStudentGrades extends JPanel implements ActionListener {
                     
 				} else {
                     
-                    JTextField inputText = new JTextField();
+                    final JTextField inputText = new JTextField();
                     if (col == 0) {
                         inputText.setColumns(30);
                     } else {
                         inputText.setColumns(10);
                         inputText.setText(0.0 + "");
+                        inputText.setHorizontalAlignment(JTextField.RIGHT);
+                        inputText.addKeyListener(new KeyAdapter() {
+
+                            @Override
+                            public void keyPressed(KeyEvent e) {
+                                if (e.getKeyCode() == KeyEvent.VK_UP) {
+                                    double currentVal = 0;
+                                    try {    
+                                        currentVal = Double.parseDouble(inputText.getText()) + 1;
+                                    } catch (Exception ex) {
+                                        currentVal = 0;
+                                    }
+                                    
+                                    if (currentVal >= 0) inputText.setText(currentVal + "");
+                                } else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
+                                    double currentVal = 0;
+                                    try {    
+                                        currentVal = Double.parseDouble(inputText.getText()) - 1;
+                                    } catch (Exception ex) {
+                                        currentVal = 0;
+                                    }
+                                    
+                                    if (currentVal >= 0) inputText.setText(currentVal + "");
+                                }
+                            }
+                            
+                        });
                     }
                     this.add(inputText, constraints);
 
