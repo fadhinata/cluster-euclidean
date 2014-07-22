@@ -142,7 +142,7 @@ public class PanelTabStudentGrades extends JPanel implements ActionListener {
                 if (comp instanceof JTextField) {
                     String val = ((JTextField) comp).getText();
                     if (val == null || "".equals(val)) {
-                        JOptionPane.showMessageDialog(null, "Value can't be empty");
+                        JOptionPane.showMessageDialog(null, "Input tidak boleh kosong");
                         return;
                     }
                     inputValues.add(val);
