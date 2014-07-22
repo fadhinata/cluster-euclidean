@@ -9,7 +9,6 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.TrayIcon.MessageType;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -145,7 +144,7 @@ public class MainDialog extends JDialog implements ActionListener {
     }
     
     public void actionPerformed(ActionEvent e) {
-        if ("Next".equals(e.getActionCommand())) {
+        if ("Lanjut".equals(e.getActionCommand())) {
             String txtStudent = txtStudents.getText();
             String txtQuestion = txtQuestions.getText();
             
@@ -182,7 +181,7 @@ public class MainDialog extends JDialog implements ActionListener {
                     mainFrame.setVisible(true);
                 }
             });
-        } else if ("Cancel".equals(e.getActionCommand())) {
+        } else if ("Keluar".equals(e.getActionCommand())) {
             System.exit(0);
         }
     }

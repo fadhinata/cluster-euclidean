@@ -31,6 +31,7 @@ import ta.cluster.tool.Tools;
  */
 public class MainFrame extends JFrame {
 
+    private JTabbedPane panelTabs;
     private JScrollPane scrollStudentGrades;
     private JScrollPane scrollResult;
     private JScrollPane scrollSummary;
@@ -59,11 +60,13 @@ public class MainFrame extends JFrame {
         scrollResult = new JScrollPane(new PanelTabResult());
         scrollSummary = new JScrollPane(new PanelTabSummary());
         
-        JTabbedPane panelTabs = new JTabbedPane();
+        panelTabs = new JTabbedPane();
         panelTabs.add(scrollStudentGrades, "Nilai Siswa");
         panelTabs.add(scrollResult, "Hasil");
         panelTabs.add(scrollSummary, "Ringkasan");
-        //panelTabs.setEnabledAt(1, false);
+        
+        // panelTabs.setEnabledAt(1, false);
+        // panelTabs.setEnabledAt(2, false);
         
 		getContentPane().add(panelTabs, BorderLayout.CENTER);
 	}
@@ -115,6 +118,9 @@ public class MainFrame extends JFrame {
             
             PanelTabSummary panelTabSummary = (PanelTabSummary) scrollSummary.getViewport().getComponent(0);
             assignSummaryText(panelTabSummary);
+            
+            // panelTabs.setEnabledAt(1, true);
+            // panelTabs.setEnabledAt(2, true);
         }
         
     }
