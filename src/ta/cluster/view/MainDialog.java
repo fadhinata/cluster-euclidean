@@ -4,6 +4,7 @@
  */
 package ta.cluster.view;
 
+import ta.cluster.view.filter.IntDocumentFilter;
 import java.awt.BorderLayout;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -25,9 +26,11 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import javax.swing.text.PlainDocument;
 import ta.cluster.core.Configuration;
 import ta.cluster.tool.Constants;
 import ta.cluster.tool.Tools;
+import ta.cluster.tool.SimpleValidator;
 
 /**
  *
@@ -82,7 +85,7 @@ public class MainDialog extends JDialog implements ActionListener {
         constraint.gridy = 0;
         constraint.fill = GridBagConstraints.HORIZONTAL;
 
-        txtStudents = new JTextField("20");
+        txtStudents = new JTextField("0");
         txtStudents.setColumns(10);
         txtStudents.setHorizontalAlignment(JTextField.RIGHT);
         txtStudents.addKeyListener(new KeyAdapter() {
@@ -130,7 +133,7 @@ public class MainDialog extends JDialog implements ActionListener {
         constraint.gridy = 1;
         constraint.fill = GridBagConstraints.HORIZONTAL;
 
-        txtQuestions = new JTextField("10");
+        txtQuestions = new JTextField("0");
         txtQuestions.setColumns(10);
         txtQuestions.setHorizontalAlignment(JTextField.RIGHT);
         txtQuestions.addKeyListener(new KeyAdapter() {
@@ -161,6 +164,7 @@ public class MainDialog extends JDialog implements ActionListener {
                     }
                 }
             }
+
         });
         panel.add(txtQuestions, constraint);
 
@@ -183,25 +187,13 @@ public class MainDialog extends JDialog implements ActionListener {
         panel.add(panelBtn, constraint);
 
         getContentPane().add(panel, BorderLayout.CENTER);
-    }
-
-    private void gotoMainFrame() {
-
-        final int numStudents = Integer.valueOf(txtStudents.getText());
-        final int numQuestions = Integer.valueOf(txtQuestions.getText());
-
-        Configuration config = Configuration.getInstance();
-        config.setNumStudets(numStudents);
-        config.setNumQuestions(numQuestions);
-
-        SwingUtilities.invokeLater(new Runnable() {
-
-            public void run() {
-                MainDialog.this.dispose();
-                MainFrame mainFrame = new MainFrame();
-                mainFrame.setVisible(true);
-            }
-        });
+        
+        // Set filter number on input text
+        PlainDocument docStudent = (PlainDocument) txtStudents.getDocument();
+        docStudent.setDocumentFilter(new IntDocumentFilter());
+        
+        PlainDocument docQuestion = (PlainDocument) txtQuestions.getDocument();
+        docQuestion.setDocumentFilter(new IntDocumentFilter());
     }
 
     public void actionPerformed(ActionEvent e) {
@@ -209,13 +201,13 @@ public class MainDialog extends JDialog implements ActionListener {
             String txtStudent = txtStudents.getText();
             String txtQuestion = txtQuestions.getText();
 
-            if ("".equals(txtStudent)) {
-                JOptionPane.showMessageDialog(null, "Masukkan jumlah siswa", "Cluster Application", JOptionPane.ERROR_MESSAGE);
+            if (SimpleValidator.isEmpty(txtStudent)) {
+                JOptionPane.showMessageDialog(null, "Jumlah siswa tidak boleh kosong", "Cluster Application", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
-            if ("".equals(txtQuestion)) {
-                JOptionPane.showMessageDialog(null, "Masukkan jumlah soal", "Cluster Application", JOptionPane.ERROR_MESSAGE);
+            if (SimpleValidator.isEmpty(txtQuestion)) {
+                JOptionPane.showMessageDialog(null, "Jumlah soal tidak boleh kosong", "Cluster Application", JOptionPane.ERROR_MESSAGE);
                 return;
             }
 
@@ -230,6 +222,16 @@ public class MainDialog extends JDialog implements ActionListener {
                 return;
             }
 
+            if (SimpleValidator.isSmallerEqual(numStudents, 0)) {
+                JOptionPane.showMessageDialog(null, "Jumlah siswa harus lebih besar dari nol", "Cluster Application", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
+            if (SimpleValidator.isSmallerEqual(numQuestions, 0)) {
+                JOptionPane.showMessageDialog(null, "Jumlah soal harus lebih besar dari nol", "Cluster Application", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+            
             Configuration config = Configuration.getInstance();
             config.setNumStudets(numStudents);
             config.setNumQuestions(numQuestions);
