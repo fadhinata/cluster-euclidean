@@ -4,6 +4,7 @@
  */
 package ta.cluster.view;
 
+import ta.cluster.view.filter.IntDocumentFilter;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -19,6 +20,7 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.text.PlainDocument;
 import ta.cluster.core.ClusterCalculator;
 import ta.cluster.core.Configuration;
 import ta.cluster.core.DataStore;
@@ -76,25 +78,26 @@ public class PanelTabStudentGrades extends JPanel implements ActionListener {
                         inputText.setColumns(30);
                     } else {
                         inputText.setColumns(10);
-                        inputText.setText(0.0 + "");
+                        inputText.setText("0");
                         inputText.setHorizontalAlignment(JTextField.RIGHT);
                         inputText.addKeyListener(new KeyAdapter() {
 
                             @Override
                             public void keyPressed(KeyEvent e) {
+                                
                                 if (e.getKeyCode() == KeyEvent.VK_UP) {
-                                    double currentVal = 0;
+                                    int currentVal = 0;
                                     try {    
-                                        currentVal = Double.parseDouble(inputText.getText()) + 1;
+                                        currentVal = Integer.parseInt(inputText.getText()) + 1;
                                     } catch (Exception ex) {
                                         currentVal = 0;
                                     }
                                     
                                     if (currentVal >= 0) inputText.setText(currentVal + "");
                                 } else if (e.getKeyCode() == KeyEvent.VK_DOWN) {
-                                    double currentVal = 0;
+                                    int currentVal = 0;
                                     try {    
-                                        currentVal = Double.parseDouble(inputText.getText()) - 1;
+                                        currentVal = Integer.parseInt(inputText.getText()) - 1;
                                     } catch (Exception ex) {
                                         currentVal = 0;
                                     }
@@ -103,10 +106,13 @@ public class PanelTabStudentGrades extends JPanel implements ActionListener {
                                 }
                             }
                             
-                        });
+                        });                        
+                    
+                        // Set filter number on input text
+                        PlainDocument doc = (PlainDocument) inputText.getDocument();
+                        doc.setDocumentFilter(new IntDocumentFilter());
                     }
                     this.add(inputText, constraints);
-
 				}
 			}
 		}
