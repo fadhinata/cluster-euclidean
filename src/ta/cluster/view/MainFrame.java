@@ -119,6 +119,7 @@ public class MainFrame extends JFrame {
             PanelTabSummary panelTabSummary = (PanelTabSummary) scrollSummary.getViewport().getComponent(0);
             assignSummaryText(panelTabSummary);
             
+            panelTabs.setSelectedIndex(1);
             // panelTabs.setEnabledAt(1, true);
             // panelTabs.setEnabledAt(2, true);
         }
