@@ -114,6 +114,7 @@ public class PanelTabResult extends JPanel {
                     JTextField inputText = new JTextField();
                     inputText.setColumns(15);
                     inputText.setHorizontalAlignment(JTextField.RIGHT);
+                    inputText.setEnabled(false);
                     panel.add(inputText, constraint);
                 }
 
@@ -149,7 +150,7 @@ public class PanelTabResult extends JPanel {
                     } else {
                         JTextField inputText = new JTextField("");
                         inputText.setColumns(30);
-                        
+                        inputText.setEnabled(false);
                         panel.add(inputText, constraint);
                     }
                     
@@ -161,7 +162,7 @@ public class PanelTabResult extends JPanel {
                         JTextField inputText = new JTextField("");
                         inputText.setColumns(30);
                         inputText.setHorizontalAlignment(JTextField.RIGHT);
-                        
+                        inputText.setEnabled(false);
                         panel.add(inputText, constraint);
                     }
                     
@@ -192,6 +193,7 @@ public class PanelTabResult extends JPanel {
                 
                 JTextField inputText = new JTextField();
                 inputText.setColumns(30);
+                inputText.setEnabled(false);
                 if (col > 0) {
                     inputText.setColumns(15);
                     inputText.setHorizontalAlignment(JTextField.RIGHT);
