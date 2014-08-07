@@ -27,6 +27,7 @@ import ta.cluster.core.DataStore;
 import ta.cluster.model.Question;
 import ta.cluster.model.Student;
 import ta.cluster.tool.Constants;
+import ta.cluster.tool.SimpleValidator;
 
 /**
  *
@@ -147,7 +148,7 @@ public class PanelTabStudentGrades extends JPanel implements ActionListener {
                 // If it is a textfield, get its value
                 if (comp instanceof JTextField) {
                     String val = ((JTextField) comp).getText();
-                    if (val == null || "".equals(val)) {
+                    if (val == null || Constants.STR_EMPTY.equals(val)) {
                         JOptionPane.showMessageDialog(null, "Input tidak boleh kosong");
                         return;
                     }
@@ -166,6 +167,10 @@ public class PanelTabStudentGrades extends JPanel implements ActionListener {
                 
                 if (i == 0) {
                     // Then it is an input of student name
+                    if (SimpleValidator.isNumber(inputValues.get(i))) {
+                        JOptionPane.showMessageDialog(null, "Nama tidak boleh angka");
+                        return;
+                    }
                     student = new Student(inputValues.get(i) + "");
                     studentIterator++;
                     nextStudent = (numOfQuestion * studentIterator) + studentIterator ;
