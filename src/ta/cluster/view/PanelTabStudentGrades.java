@@ -8,6 +8,7 @@ import ta.cluster.view.filter.IntDocumentFilter;
 import java.awt.Component;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -38,6 +39,7 @@ public class PanelTabStudentGrades extends JPanel implements ActionListener {
     private Configuration config;
     private DataStore dataStore;
     private JButton btnProcess;
+    private JButton btnBack;
     
     public PanelTabStudentGrades() {
         config = Configuration.getInstance();
@@ -124,9 +126,18 @@ public class PanelTabStudentGrades extends JPanel implements ActionListener {
         constraints.insets = new Insets(10, 10, 10, 10);
         constraints.anchor = GridBagConstraints.FIRST_LINE_START;
         
+        JPanel panel = new JPanel(new GridLayout(1, 2));
+        
         btnProcess = new JButton("Proses");
         btnProcess.addActionListener(this);
-        this.add(btnProcess, constraints);
+        
+        btnBack = new JButton("Kembali");
+        btnBack.addActionListener(this);
+        
+        panel.add(btnProcess);
+        panel.add(btnBack);
+        
+        this.add(panel, constraints);
         
     }
 
@@ -202,13 +213,18 @@ public class PanelTabStudentGrades extends JPanel implements ActionListener {
             
             // Process calculation
             ClusterCalculator cc = ClusterCalculator.getInstance();
-            cc.setListener(MainFrame.getListener());
+            cc.setListener(MainFrame.getProcessListener());
             cc.processCalculation();
             
             // panelTabs.setEnabledAt(1, true);
             // btnProcess.setText("Processed");
             // btnProcess.setEnabled(false);
             
+        } else if ("Kembali".equals(e.getActionCommand())) {
+            MainFrame.getFrame().dispose();
+            MainDialog mainDialog = MainDialog.getDialog();
+            mainDialog.initComponents();
+            mainDialog.setVisible(true);
         }
     }
     

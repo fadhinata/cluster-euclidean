@@ -38,12 +38,13 @@ import ta.cluster.tool.SimpleValidator;
  */
 public class MainDialog extends JDialog implements ActionListener {
 
+    private static MainDialog dialog;
     private JButton btnNext;
     private JButton btnCancel;
     private JTextField txtStudents;
     private JTextField txtQuestions;
 
-    public MainDialog() {
+    private MainDialog() {
         this.setTitle("Cluster Application");
         this.setDefaultCloseOperation(JDialog.DISPOSE_ON_CLOSE);
         this.setBounds(
@@ -60,10 +61,20 @@ public class MainDialog extends JDialog implements ActionListener {
             }
         });
 
-        initComponents();
+        // initComponents();
     }
 
-    private void initComponents() {
+    public static MainDialog getDialog() {
+        if (dialog == null) {
+            dialog = new MainDialog();
+        }
+        return dialog;
+    }
+    
+    public void initComponents() {
+        // Clear main panel
+        getContentPane().removeAll();
+        
         JPanel panel = new JPanel();
         panel.setSize(Constants.MAIN_DIALOG_INITIAL_WIDTH, Constants.MAIN_DIALOG_INITIAL_HEIGHT);
         panel.setBorder(BorderFactory.createCompoundBorder(
@@ -240,7 +251,8 @@ public class MainDialog extends JDialog implements ActionListener {
 
                 public void run() {
                     MainDialog.this.dispose();
-                    MainFrame mainFrame = new MainFrame();
+                    MainFrame mainFrame = MainFrame.getFrame();
+                    mainFrame.initComponents();
                     mainFrame.setVisible(true);
                 }
             });
@@ -259,7 +271,8 @@ public class MainDialog extends JDialog implements ActionListener {
         SwingUtilities.invokeLater(new Runnable() {
 
             public void run() {
-                MainDialog dialog = new MainDialog();
+                MainDialog dialog = MainDialog.getDialog();
+                dialog.initComponents();
                 dialog.setVisible(true);
             }
         });

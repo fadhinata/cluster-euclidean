@@ -24,7 +24,8 @@ public class MainApplication {
         SwingUtilities.invokeLater(new Runnable() {
 
             public void run() {
-                MainDialog mainDialog = new MainDialog();
+                MainDialog mainDialog = MainDialog.getDialog();
+                mainDialog.initComponents();
                 mainDialog.setVisible(true);
             }
         });

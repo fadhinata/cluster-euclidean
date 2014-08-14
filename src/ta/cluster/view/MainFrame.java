@@ -36,26 +36,41 @@ public class MainFrame extends JFrame {
     private JScrollPane scrollResult;
     private JScrollPane scrollSummary;
     
-    private static MainFrameListener listener;
+    private static MainFrame frame;
+    private static ProcessListener listener;
+    
     private ClusterCalculator cc;
     private Configuration config;
     
-	public MainFrame() {
+	private MainFrame() {
 		super("Cluster Application");
     	setBounds(
                 Tools.getCenterWidth(Constants.MAIN_FRAME_INITIAL_WIDTH), 
                 Tools.getCenterHeight(Constants.MAIN_FRAME_INITIAL_HEIGHT), 
                 Constants.MAIN_FRAME_INITIAL_WIDTH, 
                 Constants.MAIN_FRAME_INITIAL_HEIGHT);
-		setDefaultCloseOperation(EXIT_ON_CLOSE);
-		initComponents();
-        listener = new MainFrameListener();
+		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        // initComponents();
+        listener = new ProcessListener();
         cc = ClusterCalculator.getInstance();
         config = Configuration.getInstance();
 	}
 
-	private void initComponents() {
-		
+    public static MainFrame getFrame() {
+        if (frame == null) {
+            frame = new MainFrame();
+        } 
+        return frame;
+    }
+    
+    public void close() {
+        dispose();
+    }
+    
+	public void initComponents() {
+        // Clear main panel
+        getContentPane().removeAll();
+        
 		scrollStudentGrades = new JScrollPane(new PanelTabStudentGrades());
         scrollResult = new JScrollPane(new PanelTabResult());
         scrollSummary = new JScrollPane(new PanelTabSummary());
@@ -84,18 +99,19 @@ public class MainFrame extends JFrame {
         SwingUtilities.invokeLater(new Runnable() {
 
             public void run() {
-                MainFrame frame = new MainFrame();
+                MainFrame frame = MainFrame.getFrame();
+                frame.initComponents();
                 frame.setVisible(true);
             }
         });
         
 	}
     
-    public static MainFrameListener getListener() {
+    public static ProcessListener getProcessListener() {
         return listener;
     }
     
-    public final class MainFrameListener implements ClusterCalculatorListener {
+    public final class ProcessListener implements ClusterCalculatorListener {
 
         public void started(String message) {
             System.out.println(message);
@@ -130,6 +146,8 @@ public class MainFrame extends JFrame {
         
         HashMap mapHighestValues = cc.getMapHighestValues();
         
+        HashMap mapEuclideanDistance = (HashMap) mapHighestValues.get("highestEuclideanDistance");
+        
         StringBuilder sb = new StringBuilder();
         sb.append("Modus yang diperoleh dari data diatas adalah sebagai berikut:")
                 .append("\n")
@@ -139,7 +157,8 @@ public class MainFrame extends JFrame {
                 .append("\n")
                 .append("- Standart deviasinya  : ").append(mapHighestValues.get("highestDeviation"))
                 .append("\n")
-                .append("- Siswa yang nilainya  : ").append(mapHighestValues.get("highestEuclideanDistance"));
+                .append("- Siswa yang nilainya  : ").append(mapEuclideanDistance.get("euclideanDistance"))
+                .append(" (").append(((Student)mapEuclideanDistance.get("student")).getName()).append(")");
         
         JTextArea textAreaSummary = panel.getTextAreaSummary();
         textAreaSummary.setText(sb.toString());
