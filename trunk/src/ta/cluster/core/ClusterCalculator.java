@@ -6,11 +6,15 @@ package ta.cluster.core;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import ta.cluster.model.Question;
 import ta.cluster.model.Student;
+import ta.cluster.tool.Tools;
 
 /**
  *
@@ -53,7 +57,7 @@ public class ClusterCalculator {
         mapDeviationStandardPerQuestion = calculateDeviationStandardPerQuestion();
         listStandardScoreQuestionsPerStudent = calculateStandardScoreQuestionsPerStudent();
         listEuclideanDistanceStudent = calculateEuclideanDistanceStudent();
-        mapHighestValues = calculateHighestVaules();
+        mapHighestValues = calculateHighestValues();
         
         if (listener != null) listener.finished("Calculation finished");
     }
@@ -197,8 +201,8 @@ public class ClusterCalculator {
             Student student = (Student) mapStandardScoreStudent.get("student");
             HashMap mapStandardScoreQuestion = (HashMap) mapStandardScoreStudent.get("standardScore");
             
-            double highestScore = getHighestScore(mapStandardScoreQuestion);
-            double lowestScore = getLowestScore(mapStandardScoreQuestion);
+            double highestScore = getHighestValue(mapStandardScoreQuestion);
+            double lowestScore = getLowestValue(mapStandardScoreQuestion);
             double euclideanDistance = ((highestScore - lowestScore) * (highestScore - lowestScore)) * numOfStudents;
             
             HashMap mapEuclidean = new HashMap();
@@ -210,27 +214,42 @@ public class ClusterCalculator {
         return listEuclideanDistance;
     }
     
-    public HashMap calculateHighestVaules() {
-        double highestScorePerQuestion = getHighestScore(mapTotalScorePerQuestion);
-        double highestMean = getHighestScore(mapMeanPerQuestion);
-        double highestDeviation = getHighestScore(mapDeviationStandardPerQuestion);
+    public HashMap calculateHighestValues() {
+        double highestScorePerQuestion = getHighestValue(mapTotalScorePerQuestion);
+        double highestMean = getHighestValue(mapMeanPerQuestion);
+        double highestDeviation = getHighestValue(mapDeviationStandardPerQuestion);
         
         HashMap mapEuclideanDistance = new HashMap();
         for (int i = 0; i < listEuclideanDistanceStudent.size(); i++) {
             HashMap map = (HashMap) listEuclideanDistanceStudent.get(i);
             mapEuclideanDistance.put(i, map.get("euclideanDistance"));
         }
-        double highestEuclideanDistance = getHighestScore(mapEuclideanDistance);
+        double highestEuclideanDistance = getHighestValue(mapEuclideanDistance);
+        
+        sortEuclideanDistanceListDsc(listEuclideanDistanceStudent, "euclideanDistance");
         
         HashMap mapHighest = new HashMap();
         mapHighest.put("highestScore", highestScorePerQuestion);
         mapHighest.put("highestMean", highestMean);
         mapHighest.put("highestDeviation", highestDeviation);
-        mapHighest.put("highestEuclideanDistance", highestEuclideanDistance);
+        mapHighest.put("highestEuclideanDistance", listEuclideanDistanceStudent.get(0));
         return mapHighest;
     }
     
-    private double getHighestScore(HashMap mapScores) {
+    public static void sortEuclideanDistanceListDsc(List list, final String key) {
+        
+        Collections.sort(list, new Comparator<HashMap>() {
+
+            public int compare(HashMap o1, HashMap o2) {
+                double d1 = Double.valueOf(o1.get(key) + "");
+                double d2 = Double.valueOf(o2.get(key) + "");
+                return d1 > d2 ? 0 : 1;
+            }
+        
+        });
+    }
+    
+    private double getHighestValue(HashMap mapScores) {
         double highest = 0;
         double[] arrScores = new double[mapScores.size()];
         int i = 0;
@@ -247,7 +266,7 @@ public class ClusterCalculator {
         return highest;
     }
     
-    private double getLowestScore(HashMap mapScores) {
+    private double getLowestValue(HashMap mapScores) {
         double lowest = 0;
         double[] arrScores = new double[mapScores.size()];
         int i = 0;
@@ -312,4 +331,34 @@ public class ClusterCalculator {
         this.mapHighestValues = mapHighestValues;
     }
 
+    public static void main(String[] args) {
+        Student studentA = new Student("A");
+        Student studentB = new Student("B");
+        Student studentC = new Student("C");
+        
+        double scoreA = 2.0093884;
+        double scoreB = 1.343892;
+        double scoreC = 3.221982;
+        
+        List list = new ArrayList();
+        
+        HashMap map = new HashMap();
+        map.put("student", studentA);
+        map.put("euclideanDistance", scoreA);
+        list.add(map);
+        
+        map = new HashMap();
+        map.put("student", studentB);
+        map.put("euclideanDistance", scoreB);
+        list.add(map);
+        
+        map = new HashMap();
+        map.put("student", studentC);
+        map.put("euclideanDistance", scoreC);
+        list.add(map);
+        
+        sortEuclideanDistanceListDsc(list, "euclideanDistance");
+        System.out.println("SORTED: " + list);
+    }
+    
 }
