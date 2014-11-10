@@ -16,5 +16,6 @@ public class Constants {
     public static final int MAIN_FRAME_INITIAL_HEIGHT = 480;
     
     public static final String STR_EMPTY = "";
+    public static final String PERSISTENCE_UNIT_NAME = "default";
     
 }

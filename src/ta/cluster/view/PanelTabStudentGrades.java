@@ -21,12 +21,17 @@ import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import javax.swing.SwingUtilities;
 import javax.swing.text.PlainDocument;
+import org.apache.log4j.Logger;
 import ta.cluster.core.ClusterCalculator;
 import ta.cluster.core.Configuration;
 import ta.cluster.core.DataStore;
-import ta.cluster.model.Question;
-import ta.cluster.model.Student;
+import ta.cluster.core.DatabaseClusterCalculator;
+import ta.cluster.dao.StudentDao;
+import ta.cluster.dao.StudentQuestionMappingDao;
+import ta.cluster.model.QuestionModel;
+import ta.cluster.model.StudentModel;
 import ta.cluster.tool.Constants;
 import ta.cluster.tool.SimpleValidator;
 
@@ -35,6 +40,8 @@ import ta.cluster.tool.SimpleValidator;
  * @author Matt
  */
 public class PanelTabStudentGrades extends JPanel implements ActionListener {
+    
+    private static final Logger log = Logger.getLogger(PanelTabStudentGrades.class);
 
     private Configuration config;
     private DataStore dataStore;
@@ -46,6 +53,8 @@ public class PanelTabStudentGrades extends JPanel implements ActionListener {
         dataStore = DataStore.getInstance();
         this.setSize(Constants.MAIN_FRAME_INITIAL_HEIGHT, Constants.MAIN_FRAME_INITIAL_WIDTH);
         initComponents();
+        
+        
     }
     
     private void initComponents() {
@@ -141,86 +150,87 @@ public class PanelTabStudentGrades extends JPanel implements ActionListener {
         
     }
 
-    public void actionPerformed(ActionEvent e) {
-        if ("Proses".equals(e.getActionCommand())) {
+    public void actionPerformed(ActionEvent event) {
+        if ("Proses".equals(event.getActionCommand())) {
             
-            System.out.println("Process ...");
-            
-            int numOfStudent = config.getNumStudents();
-            int numOfQuestion = config.getNumQuestions();
-            
-            System.out.println("STUDENTS: " + numOfStudent);
-            System.out.println("QUESTIONS: " + numOfQuestion);
-            
-            // Get number of textfields, and store the values
-            ArrayList inputValues = new ArrayList();
-            for (int c = 0; c < this.getComponentCount(); c++) {
-                Component comp = this.getComponent(c);
-                // If it is a textfield, get its value
-                if (comp instanceof JTextField) {
-                    String val = ((JTextField) comp).getText();
-                    if (val == null || Constants.STR_EMPTY.equals(val)) {
-                        JOptionPane.showMessageDialog(null, "Input tidak boleh kosong");
-                        return;
-                    }
-                    inputValues.add(val);
-                }
-            }
-            System.out.println("inputValues.size(): " + inputValues.size());
-            System.out.println(inputValues);
-            Student student = null;
-            List<Student> listStudents = new ArrayList<Student>();
-            List<Question> listQuestions = null;
-            int questionIterator = 0;
-            int studentIterator = 0;
-            int nextStudent = 0;
-            for (int i = 0; i < inputValues.size(); i++) {
-                
-                if (i == 0) {
-                    // Then it is an input of student name
-                    if (SimpleValidator.isNumber(inputValues.get(i))) {
-                        JOptionPane.showMessageDialog(null, "Nama tidak boleh angka");
-                        return;
-                    }
-                    student = new Student(inputValues.get(i) + "");
-                    studentIterator++;
-                    nextStudent = (numOfQuestion * studentIterator) + studentIterator ;
-                    listQuestions = new ArrayList<Question>();
-                } else {
-                    
-                    if (i == nextStudent) {
-                        // Then it is an input of student name
-                        student = new Student(inputValues.get(i) + "");
-                        studentIterator++;
-                        nextStudent = (numOfQuestion * studentIterator) + studentIterator ;
-                        listQuestions = new ArrayList<Question>();
-                    } else {
-                        // It is an input of question
-                        Question question = new Question(questionIterator + 1, Double.valueOf(inputValues.get(i) + ""));
-                        listQuestions.add(question);
-                        questionIterator++;
-                        if (questionIterator == numOfQuestion) {
-                            questionIterator = 0;
-                            student.setListQuestions(listQuestions);
-                            listStudents.add(student);
+            log.debug("Process ...");
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+
+                    int numOfStudent = config.getNumStudents();
+                    int numOfQuestion = config.getNumQuestions();
+
+                    // Get number of textfields, and store the values
+                    ArrayList inputValues = new ArrayList();
+                    for (int c = 0; c < PanelTabStudentGrades.this.getComponentCount(); c++) {
+                        Component comp = PanelTabStudentGrades.this.getComponent(c);
+                        // If it is a textfield, get its value
+                        if (comp instanceof JTextField) {
+                            String val = ((JTextField) comp).getText();
+                            if (val == null || Constants.STR_EMPTY.equals(val)) {
+                                JOptionPane.showMessageDialog(null, "Input tidak boleh kosong");
+                                return;
+                            }
+                            inputValues.add(val);
                         }
                     }
+
+                    StudentModel studentModel = null;
+                    List<StudentModel> listStudents = new ArrayList<StudentModel>();
+                    List<QuestionModel> listQuestions = null;
+                    int questionIterator = 0;
+                    int studentIterator = 0;
+                    int nextStudent = 0;
+                    for (int i = 0; i < inputValues.size(); i++) {
+
+                        if (i == 0) {
+                            // Then it is an input of student name
+                            if (SimpleValidator.isNumber(inputValues.get(i))) {
+                                JOptionPane.showMessageDialog(null, "Nama tidak boleh angka");
+                                return;
+                            }
+                            studentModel = new StudentModel(inputValues.get(i) + "");
+                            studentIterator++;
+                            nextStudent = (numOfQuestion * studentIterator) + studentIterator ;
+                            listQuestions = new ArrayList<QuestionModel>();
+                        } else {
+
+                            if (i == nextStudent) {
+                                // Then it is an input of student name
+                                studentModel = new StudentModel(inputValues.get(i) + "");
+                                studentIterator++;
+                                nextStudent = (numOfQuestion * studentIterator) + studentIterator ;
+                                listQuestions = new ArrayList<QuestionModel>();
+                            } else {
+                                // It is an input of question
+                                QuestionModel question = new QuestionModel(questionIterator + 1, Double.valueOf(inputValues.get(i) + ""));
+                                listQuestions.add(question);
+                                questionIterator++;
+                                if (questionIterator == numOfQuestion) {
+                                    questionIterator = 0;
+                                    studentModel.setListQuestions(listQuestions);
+                                    listStudents.add(studentModel);
+                                }
+                            }
+                        }
+                    }
+
+                    dataStore.setListStudents(listStudents);
+
+                    // Process calculation
+                    // StudentClusterCalculator cc = PlainStudentClusterCalculator.getInstance();
+                    final ClusterCalculator cc = DatabaseClusterCalculator.getInstance();
+                    cc.setListener(MainFrame.getProcessListener());
+                    cc.process();
+                    
+                    // panelTabs.setEnabledAt(1, true);
+                    // btnProcess.setText("Processed");
+                    // btnProcess.setEnabled(false);
+
                 }
-            }
+            });
             
-            System.out.println("listStudents: " + listStudents);
-            dataStore.setListStudents(listStudents);
-            
-            // Process calculation
-            ClusterCalculator cc = ClusterCalculator.getInstance();
-            cc.setListener(MainFrame.getProcessListener());
-            cc.processCalculation();
-            
-            // panelTabs.setEnabledAt(1, true);
-            // btnProcess.setText("Processed");
-            // btnProcess.setEnabled(false);
-            
-        } else if ("Kembali".equals(e.getActionCommand())) {
+        } else if ("Kembali".equals(event.getActionCommand())) {
             MainFrame.getFrame().dispose();
             MainDialog mainDialog = MainDialog.getDialog();
             mainDialog.initComponents();

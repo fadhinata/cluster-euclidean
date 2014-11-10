@@ -5,7 +5,7 @@
 package ta.cluster.core;
 
 import java.util.List;
-import ta.cluster.model.Student;
+import ta.cluster.model.StudentModel;
 
 /**
  *
@@ -14,7 +14,7 @@ import ta.cluster.model.Student;
 public class DataStore {
  
     private static DataStore instance;
-    private List<Student> listStudents;
+    private List<StudentModel> listStudents;
 
     private DataStore() {
         
@@ -27,11 +27,11 @@ public class DataStore {
         return instance;
     }
     
-    public List<Student> getListStudents() {
+    public List<StudentModel> getListStudents() {
         return listStudents;
     }
 
-    public void setListStudents(List<Student> listStudents) {
+    public void setListStudents(List<StudentModel> listStudents) {
         this.listStudents = listStudents;
     }
 
