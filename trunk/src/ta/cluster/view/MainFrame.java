@@ -10,7 +10,9 @@ import java.awt.Component;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTabbedPane;
@@ -18,10 +20,12 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import org.apache.log4j.Logger;
 import ta.cluster.core.ClusterCalculator;
 import ta.cluster.core.ClusterCalculatorListener;
 import ta.cluster.core.Configuration;
-import ta.cluster.model.Student;
+import ta.cluster.core.DatabaseClusterCalculator;
+import ta.cluster.model.StudentModel;
 import ta.cluster.tool.Constants;
 import ta.cluster.tool.Tools;
 
@@ -30,11 +34,14 @@ import ta.cluster.tool.Tools;
  * @author Matt
  */
 public class MainFrame extends JFrame {
+    
+    private static final Logger log = Logger.getLogger(MainFrame.class);
 
     private JTabbedPane panelTabs;
     private JScrollPane scrollStudentGrades;
     private JScrollPane scrollResult;
     private JScrollPane scrollSummary;
+    private JDialog loadingDlg;
     
     private static MainFrame frame;
     private static ProcessListener listener;
@@ -52,8 +59,15 @@ public class MainFrame extends JFrame {
 		setDefaultCloseOperation(DISPOSE_ON_CLOSE);
         // initComponents();
         listener = new ProcessListener();
-        cc = ClusterCalculator.getInstance();
+        // cc = PlainStudentClusterCalculator.getInstance();
+        cc = DatabaseClusterCalculator.getInstance();
         config = Configuration.getInstance();
+        
+        loadingDlg = new JDialog(MainFrame.this, "Progress", true);
+        loadingDlg.add(BorderLayout.NORTH, new JLabel("Please wait ..."));
+        loadingDlg.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
+        loadingDlg.setSize(300, 75);
+        loadingDlg.setLocationRelativeTo(MainFrame.this);
 	}
 
     public static MainFrame getFrame() {
@@ -111,38 +125,53 @@ public class MainFrame extends JFrame {
         return listener;
     }
     
+    private void showLoadingDialog(boolean show) {
+        loadingDlg.setVisible(show);
+    }
+    
     public final class ProcessListener implements ClusterCalculatorListener {
 
         public void started(String message) {
-            System.out.println(message);
+            log.debug(message);
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    showLoadingDialog(true);
+                }
+            });
         }
 
         public void calculating(String message) {
-            System.out.println(message);
+            log.debug(message);
         }
 
         public void finished(String message) {
-            System.out.println(message);
+            log.debug(message);
             
             PanelTabResult panelTabResult = (PanelTabResult) scrollResult.getViewport().getComponent(0);
             
-            assignScoreValues(panelTabResult.getPanelScore());
-            assignMeanValues(panelTabResult.getPanelMean());
-            assignDeviationValues(panelTabResult.getPanelDeviation());
-            assignStandardScoreStudents(panelTabResult.getPanelStandardScoreStudent());
-            assignEuclideanDistance(panelTabResult.getPanelEuclideanDistance());
+            assignScoreValuesToPanel(panelTabResult.getPanelScore());
+            assignMeanValuesToPanel(panelTabResult.getPanelMean());
+            assignDeviationValuesToPanel(panelTabResult.getPanelDeviation());
+            assignStandardScoreStudentsToPanel(panelTabResult.getPanelStandardScoreStudent());
+            assignEuclideanDistanceToPanel(panelTabResult.getPanelEuclideanDistance());
             
             PanelTabSummary panelTabSummary = (PanelTabSummary) scrollSummary.getViewport().getComponent(0);
-            assignSummaryText(panelTabSummary);
+            assignSummaryTextToPanel(panelTabSummary);
             
             panelTabs.setSelectedIndex(1);
             // panelTabs.setEnabledAt(1, true);
             // panelTabs.setEnabledAt(2, true);
+            
+            SwingUtilities.invokeLater(new Runnable() {
+                public void run() {
+                    showLoadingDialog(false);
+                }
+            });
         }
         
     }
     
-    private void assignSummaryText(PanelTabSummary panel) {
+    private void assignSummaryTextToPanel(PanelTabSummary panel) {
         
         HashMap mapHighestValues = cc.getMapHighestValues();
         
@@ -158,14 +187,17 @@ public class MainFrame extends JFrame {
                 .append("- Standart deviasinya  : ").append(mapHighestValues.get("highestDeviation"))
                 .append("\n")
                 .append("- Siswa yang nilainya  : ").append(mapEuclideanDistance.get("euclideanDistance"))
-                .append(" (").append(((Student)mapEuclideanDistance.get("student")).getName()).append(")");
+                .append(" (").append(((StudentModel)mapEuclideanDistance.get("student")).getName()).append(")");
         
         JTextArea textAreaSummary = panel.getTextAreaSummary();
         textAreaSummary.setText(sb.toString());
     }
     
-    private void assignScoreValues(JPanel toPanel) {
+    private void assignScoreValuesToPanel(JPanel toPanel) {
+        log.debug("Assign score values to panel ... ");
         HashMap mapScorePerQuestions = cc.getMapTotalScorePerQuestion();
+        log.debug("Map score per question: ");
+        log.debug(mapScorePerQuestions + "");
         Component[] components = toPanel.getComponents();
         int num = 1;
         for (int i = 0; i < components.length; i++) {
@@ -178,8 +210,11 @@ public class MainFrame extends JFrame {
         }
     }
     
-    private void assignMeanValues(JPanel toPanel) {
+    private void assignMeanValuesToPanel(JPanel toPanel) {
+        log.debug("Assign mean values to panel ...");
         HashMap mapMeanPerQuestion = cc.getMapMeanPerQuestion();
+        log.debug("Map mean per question: ");
+        log.debug("" + mapMeanPerQuestion);
         Component[] components = toPanel.getComponents();
         int num = 1;
         for (int i = 0; i < components.length; i++) {
@@ -192,8 +227,11 @@ public class MainFrame extends JFrame {
         }
     }
     
-    private void assignDeviationValues(JPanel toPanel) {
+    private void assignDeviationValuesToPanel(JPanel toPanel) {
+        log.debug("Assign deviation values to panel ...");
         HashMap mapDeviation = cc.getMapDeviationStandardPerQuestion();
+        log.debug("Map deviation:");
+        log.debug("" + mapDeviation);
         Component[] components = toPanel.getComponents();
         int num = 1;
         for (int i = 0; i < components.length; i++) {
@@ -206,17 +244,18 @@ public class MainFrame extends JFrame {
         }
     }
     
-    private void assignStandardScoreStudents(JPanel toPanel) {
-        
+    private void assignStandardScoreStudentsToPanel(JPanel toPanel) {
+        log.debug("Assign standard score student to panel ...");
         List listStandardScoreStudents = cc.getListStandardScoreQuestionsPerStudent();
-        System.out.println("listStandardScoreStudents: " + listStandardScoreStudents);
+        log.debug("List standard score students: ");
+        log.debug("" + listStandardScoreStudents);
         
         // Create list of students
-        List<Student> listStudents = new ArrayList<Student>();
+        List<StudentModel> listStudents = new ArrayList<StudentModel>();
         for (int i = 0; i < listStandardScoreStudents.size(); i++) {
             
             HashMap mapStandardScoreStudent = (HashMap) listStandardScoreStudents.get(i);
-            Student student = (Student) mapStandardScoreStudent.get("student");
+            StudentModel student = (StudentModel) mapStandardScoreStudent.get("student");
             listStudents.add(student);
 
         }
@@ -231,9 +270,7 @@ public class MainFrame extends JFrame {
         for (int i = 0; i < numOfQuestions; i++) {
             List listStandardScore = new ArrayList();
             int num = i + 1;
-            System.out.println("question: " + num);
             for (int c = 0; c < listStandardScoreStudents.size(); c++) {
-                System.out.println("c : " + c);
                 HashMap mapStandardScoreStudent = (HashMap) listStandardScoreStudents.get(c);
                 HashMap mapStandardScore = (HashMap) mapStandardScoreStudent.get("standardScore");
                 Object standardScore = mapStandardScore.get(num);
@@ -243,20 +280,17 @@ public class MainFrame extends JFrame {
             mapStandardScoreQuestion.put(num, listStandardScore);
         }
         
-        System.out.println("listStudents: " + listStudents);
-        System.out.println("mapStandardScore: " + mapStandardScoreQuestion);
-        
         Component[] components = toPanel.getComponents();
         int textFieldCount = 0;
         int studentCount = 0;
         int num = 1;
         for (int i = 0; i < components.length; i++) {
             Component component = components[i];
-            //System.out.println("comp: " + component.getClass());
+            //log.debug("comp: " + component.getClass());
                             
             if (component instanceof JTextField) {
                 if (textFieldCount < listStudents.size()) {    
-                    Student student = listStudents.get(textFieldCount);
+                    StudentModel student = listStudents.get(textFieldCount);
                     ((JTextField) component).setText(student.getName());
                 } else {
                     ArrayList listStandardScore = (ArrayList) mapStandardScoreQuestion.get(num);
@@ -275,8 +309,12 @@ public class MainFrame extends JFrame {
         }
     }
     
-    private void assignEuclideanDistance(JPanel toPanel) {
+    private void assignEuclideanDistanceToPanel(JPanel toPanel) {
+        log.debug("Assign euclidean distance to panel ...");
         List listEuclideanDistance = cc.getListEuclideanDistanceStudent();
+        log.debug("List euclidean distance:");
+        log.debug("" + listEuclideanDistance);
+        
         Component[] components = toPanel.getComponents();
         int textFieldIterator = 0;
         int count = 0;
@@ -284,7 +322,7 @@ public class MainFrame extends JFrame {
             Component component = components[i];
             if (component instanceof JTextField) {
                 HashMap mapEuclideanDistanceStudent = (HashMap) listEuclideanDistance.get(count);
-                Student student = (Student) mapEuclideanDistanceStudent.get("student");
+                StudentModel student = (StudentModel) mapEuclideanDistanceStudent.get("student");
                 Object euclideanDistance = mapEuclideanDistanceStudent.get("euclideanDistance");
                 
                 if (textFieldIterator == 0) {

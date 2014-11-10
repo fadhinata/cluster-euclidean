@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<persistence version="1.0" xmlns="http://java.sun.com/xml/ns/persistence" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
+    <persistence-unit name="default" transaction-type="RESOURCE_LOCAL">
+        
+        <!-- OpenJPA persistence provider -->
+        <provider>org.apache.openjpa.persistence.PersistenceProviderImpl</provider>
+        
+        <class>ta.cluster.entity.Student</class>
+        <class>ta.cluster.entity.StudentQuestionMapping</class>
+        
+        <properties>
+            <property name="openjpa.ConnectionURL" value="jdbc:mysql://localhost:3306/studentdb"/>
+            <property name="openjpa.ConnectionDriverName" value="com.mysql.jdbc.Driver"/>
+            <property name="openjpa.ConnectionUserName" value="root"/>
+            <property name="openjpa.ConnectionPassword" value=""/>
+            <property name="openjpa.DynamicEnhancementAgent" value="true"/>
+            <property name="openjpa.RuntimeUnenhancedClasses" value="supported"/>
+            <property name="openjpa.Log" value="DefaultLevel=ERROR, Runtime=ERROR, Tool=ERROR, SQL=TRACE"/>
+            <!-- <property name="openjpa.Log" value="none"/> -->
+            <property name="openjpa.ConnectionFactoryProperties" value="PrettyPrint=true, PrettyPrintLineLength=72, PrintParameters=true, MaxActive=10, MaxIdle=5, MinIdle=2, MaxWait=60000"/>
+        </properties>
+        
+    </persistence-unit>
+</persistence>

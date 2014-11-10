@@ -6,7 +6,7 @@ package ta.cluster.core;
 
 /**
  *
- * @author Ideapad
+ * @author Matt
  */
 public interface ClusterCalculatorListener {
     abstract void started(String message);

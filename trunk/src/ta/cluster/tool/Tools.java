@@ -5,12 +5,12 @@
 package ta.cluster.tool;
 
 import java.awt.Toolkit;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  *
@@ -40,49 +40,54 @@ public class Tools {
         return (int) (getScreenWidth() - windowWidth) / 2;
     }
 
-    /*
-     * Java method to sort Map in Java by value e.g. HashMap or Hashtable
-     * throw NullPointerException if Map contains null values
-     * It also sort values even if they are duplicates
-     */
-    public static <K extends Comparable, V extends Comparable> Map<K, V> sortByValues(Map<K, V> map) {
-        List<Map.Entry<K, V>> entries = new LinkedList<Map.Entry<K, V>>(map.entrySet());
+    public static void sortListOfMap(List list, final String key, final boolean ascending) {
+        
+        Collections.sort(list, new Comparator<HashMap>() {
 
-        Collections.sort(entries, new Comparator<Map.Entry<K, V>>() {
-
-            @Override
-            public int compare(Map.Entry<K, V> o1, Map.Entry<K, V> o2) {
-                return o1.getValue().compareTo(o2.getValue());
+            public int compare(HashMap o1, HashMap o2) {
+                double d1 = Double.valueOf(o1.get(key) + "");
+                double d2 = Double.valueOf(o2.get(key) + "");
+                if (ascending) { 
+                    return d1 > d2 ? 0 : 1;
+                }
+                return d1 < d2 ? 0 : 1; 
             }
+        
         });
-
-        //LinkedHashMap will keep the keys in the order they are inserted
-        //which is currently sorted on natural ordering
-        Map<K, V> sortedMap = new LinkedHashMap<K, V>();
-
-        for (Map.Entry<K, V> entry : entries) {
-            sortedMap.put(entry.getKey(), entry.getValue());
-        }
-
-        return sortedMap;
     }
-
-    /*
-     * Paramterized method to sort Map e.g. HashMap or Hashtable in Java
-     * throw NullPointerException if Map contains null key
-     */
-    public static <K extends Comparable, V extends Comparable> Map<K, V> sortByKeys(Map<K, V> map) {
-        List<K> keys = new LinkedList<K>(map.keySet());
-        Collections.sort(keys);
-
-        //LinkedHashMap will keep the keys in the order they are inserted
-        //which is currently sorted on natural ordering
-        Map<K, V> sortedMap = new LinkedHashMap<K, V>();
-        for (K key : keys) {
-            sortedMap.put(key, map.get(key));
+    
+    public static double getHighestValue(HashMap mapScores) {
+        double highest = 0;
+        double[] arrScores = new double[mapScores.size()];
+        int i = 0;
+        Iterator iterator = mapScores.values().iterator();
+        while (iterator.hasNext()) {
+            double value = Double.valueOf(iterator.next() + "");
+            arrScores[i] = value;
+            i++;
         }
-
-        return sortedMap;
+        
+        Arrays.sort(arrScores);
+        highest = arrScores[arrScores.length - 1];
+        
+        return highest;
+    }
+    
+    public static double getLowestValue(HashMap mapScores) {
+        double lowest = 0;
+        double[] arrScores = new double[mapScores.size()];
+        int i = 0;
+        Iterator iterator = mapScores.values().iterator();
+        while (iterator.hasNext()) {
+            double value = Double.valueOf(iterator.next() + "");
+            arrScores[i] = value;
+            i++;
+        }
+        
+        Arrays.sort(arrScores);
+        lowest = arrScores[0];
+        
+        return lowest;
     }
     
 }
