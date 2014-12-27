@@ -27,14 +27,12 @@ public class DatabaseClusterCalculator extends AbstractClusterCalculator {
     
     private static DatabaseClusterCalculator instance;
     private DataStore dataStore;
-    private Configuration config;
     private HashMap mapTotalScorePerQuestion;
     private HashMap mapMeanPerQuestion;
     private HashMap mapDeviationStandardPerQuestion;
     private HashMap mapHighestValues;
     private List listStandardScoreQuestionsPerStudent;
     private List listEuclideanDistanceStudent;
-    private List<StudentModel> listStudents;
     private ClusterCalculatorListener listener;
     
     private StudentDao studentDao;
@@ -42,7 +40,6 @@ public class DatabaseClusterCalculator extends AbstractClusterCalculator {
     
     private DatabaseClusterCalculator() {
         dataStore = DataStore.getInstance();
-        config = Configuration.getInstance();
     }
     
     public static DatabaseClusterCalculator getInstance() {
@@ -64,25 +61,16 @@ public class DatabaseClusterCalculator extends AbstractClusterCalculator {
         
         try {
             // Clear table student
-            studentDao.beginTransaction();
-            Query queryStudent = studentDao.createQuery("DELETE FROM " + Student.ENTITY_NAME);
-            queryStudent.executeUpdate();
-            studentDao.flush();
-            studentDao.commitTransaction();
+            studentDao.deleteAll();
             log.debug("Clear table student success");
             
             try {
                 
                 // Clear table student question mapping
-                studentQuestionMappingDao.beginTransaction();
-                Query queryStudentQuestionMapping = studentQuestionMappingDao.createQuery("DELETE FROM " + StudentQuestionMapping.ENTITY_NAME);
-                queryStudentQuestionMapping.executeUpdate();
-                studentQuestionMappingDao.flush();
-                studentQuestionMappingDao.commitTransaction();
+                studentQuestionMappingDao.deleteAll();
                 log.debug("Clear table student question mapping success");
 
-                listStudents = dataStore.getListStudents();
-                for (StudentModel s : listStudents) {
+                for (StudentModel s : dataStore.getListStudents()) {
                     log.debug("Name: " + s.getName());
                     Student student = new Student();
                     student.setName(s.getName());

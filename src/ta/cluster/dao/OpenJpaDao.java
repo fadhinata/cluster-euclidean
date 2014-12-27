@@ -15,7 +15,7 @@ import javax.persistence.Query;
 import ta.cluster.tool.Constants;
 
 /**
- *
+ * Abstract class to prepare methods for database queries
  * @author Matt
  */
 public abstract class OpenJpaDao<E> {
@@ -85,6 +85,12 @@ public abstract class OpenJpaDao<E> {
         em.remove(entity);
     }
 
+    public void deleteAll() {
+        for (E entity : findAll()) {
+            em.remove(entity);
+        }
+    }
+    
     public E findById(Object id) {
         return em.find(entityClass, id);
     }
