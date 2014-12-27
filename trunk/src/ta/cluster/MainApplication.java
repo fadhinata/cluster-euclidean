@@ -6,6 +6,7 @@ package ta.cluster;
 
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
+import org.apache.log4j.Logger;
 import ta.cluster.view.MainDialog;
 
 /**
@@ -13,14 +14,17 @@ import ta.cluster.view.MainDialog;
  * @author Matt
  */
 public class MainApplication {
-    
+
+    private static Logger log = Logger.getLogger(MainApplication.class);
+
     public MainApplication() {
+        log.debug("Main application started ...");
         try {
-			UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
+            UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
             e.printStackTrace();
         }
-        
+
         SwingUtilities.invokeLater(new Runnable() {
 
             public void run() {
@@ -31,12 +35,10 @@ public class MainApplication {
         });
     }
 
-	/**
-	 * Launch the application.
-	 */
-	public static void main(String[] args) {
-		MainApplication main = new MainApplication();
-	}
-
+    /**
+     * Launch the application.
+     */
+    public static void main(String[] args) {
+        MainApplication main = new MainApplication();
+    }
 }
-

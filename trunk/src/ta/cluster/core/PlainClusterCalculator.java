@@ -5,11 +5,7 @@
 package ta.cluster.core;
 
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import org.apache.log4j.Logger;
 import ta.cluster.model.QuestionModel;

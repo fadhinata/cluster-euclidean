@@ -10,8 +10,6 @@ package ta.cluster.tool;
  */
 public class SimpleValidator {
     
-    
-    
     /**
      * Check if object is numeric
      * @param any
@@ -19,9 +17,22 @@ public class SimpleValidator {
      */
     public static boolean isNumber(Object any) {
         try {
-            Double.parseDouble(any + "");
+            Double.parseDouble(String.valueOf(any));
             return true;
         } catch (NumberFormatException nfe) {
+            return false;
+        }
+    }
+    
+    /**
+     * Check if object contains number
+     * @param any
+     * @return 
+     */
+    public static boolean containsNumber(Object any) {
+        if (String.valueOf(any).matches(".*\\d.*")) {
+            return true;
+        } else {
             return false;
         }
     }
