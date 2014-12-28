@@ -77,6 +77,7 @@ public class DatabaseClusterCalculator extends AbstractClusterCalculator {
                     try {                    
                         studentDao.beginTransaction();
                         studentDao.insert(student);
+                        studentDao.commitTransaction();
                         log.debug("Insert student success");
 
                         long studentId = student.getId();
@@ -95,10 +96,10 @@ public class DatabaseClusterCalculator extends AbstractClusterCalculator {
                             try {
                                 studentQuestionMappingDao.beginTransaction();
                                 studentQuestionMappingDao.insert(studentQuestionMapping);
+                                studentQuestionMappingDao.commitTransaction();
                                 log.debug("Insert student question mapping success");
                                 log.debug("Student question mapping id: " + studentQuestionMapping.getId());
 
-                                studentQuestionMappingDao.commitTransaction();
                             } catch (Exception e) {
                                 log.error("Insert student question mapping failed, rollback transaction", e);
                                 studentQuestionMappingDao.rollbackTransaction();
@@ -106,7 +107,6 @@ public class DatabaseClusterCalculator extends AbstractClusterCalculator {
                             }
                         }
 
-                        studentDao.commitTransaction();
                     } catch (Exception e) {
                         log.error("Insert student failed, rollback transaction", e);
                         studentDao.rollbackTransaction();
