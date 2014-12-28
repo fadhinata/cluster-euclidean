@@ -76,11 +76,10 @@ public class MainFrame extends JFrame implements Printable, ActionListener {
     private HashMap mapDeviation;
     private List listStandardScoreStudents;
     private List listEuclideanDistance;
-
     private final String STR_NEW_LINE = "\n";
     private final String STR_TAB = "    ";
     private final String STR_COMMA = ",";
-    
+
     private MainFrame() {
         super("Cluster Application");
         setBounds(
@@ -102,7 +101,7 @@ public class MainFrame extends JFrame implements Printable, ActionListener {
         loadingDlg.setSize(300, 150);
         loadingDlg.setLocationRelativeTo(frame);
         loadingDlg.add(new JLabel(loadingIcon));
-        
+
         FileFilter fileFilter = new FileFilter() {
 
             @Override
@@ -112,18 +111,17 @@ public class MainFrame extends JFrame implements Printable, ActionListener {
                 } else {
                     return false;
                 }
-            } 
+            }
 
             @Override
             public String getDescription() {
                 return "Comma Separated Value (*.csv)";
             }
         };
-        
+
         fileChooser = new JFileChooser();
         fileChooser.setFileSelectionMode(JFileChooser.FILES_AND_DIRECTORIES);
         fileChooser.setFileFilter(fileFilter);
-        fileChooser.setSelectedFile(new File("cluster-euclidean.csv"));
     }
 
     private void showLoadingDialog() {
@@ -181,11 +179,11 @@ public class MainFrame extends JFrame implements Printable, ActionListener {
         btnExportCsv = new JButton("Export to CSV");
         btnExportCsv.addActionListener(this);
         btnExportCsv.setEnabled(false);
-        
+
         JPanel panelBtn = new JPanel(new GridBagLayout());
         panelBtn.add(btnPrint);
         panelBtn.add(btnExportCsv);
-        
+
         constraint = new GridBagConstraints();
         constraint.anchor = GridBagConstraints.FIRST_LINE_START;
         constraint.gridx = 0;
@@ -208,26 +206,22 @@ public class MainFrame extends JFrame implements Printable, ActionListener {
             PrinterJob printerJob = PrinterJob.getPrinterJob();
             Book book = new Book();
             book.append(MainFrame.this, printerJob.defaultPage());
-            printerJob.setPageable(book);        
+            printerJob.setPageable(book);
             if (printerJob.printDialog()) {
                 try {
                     printerJob.print();
                     log.debug(printerJob.getPrintService().getName());
                     log.debug("Print completed ...");
                 } catch (Exception ex) {
-                    ex.printStackTrace();
-                    log.debug("Print cancelled");
+                    log.debug(ex, ex);
+                    JOptionPane.showMessageDialog(MainFrame.this, ex.toString(), "Cluster Application", JOptionPane.ERROR_MESSAGE);
                 }
             }
         } else if (e.getSource() == btnExportCsv) {
-            log.debug("Prepare export to csv");
+            log.debug("Prepare export to csv ...");
             int returnVal = fileChooser.showSaveDialog(MainFrame.this);
             if (returnVal == JFileChooser.APPROVE_OPTION) {
                 File file = fileChooser.getSelectedFile();
-                if ("".equals(file.getName())) {
-                    return;
-                }
-                
                 String path = file.getAbsolutePath();
                 log.debug("Path: " + path);
                 try {
@@ -239,21 +233,22 @@ public class MainFrame extends JFrame implements Printable, ActionListener {
                     writer.write(text);
                     writer.close();
                     log.debug("Export completed: " + path);
+                    JOptionPane.showMessageDialog(MainFrame.this, "Export berhasil", "Cluster Application", JOptionPane.INFORMATION_MESSAGE);
                 } catch (Exception ex) {
-                    ex.printStackTrace();
                     log.error(ex, ex);
+                    JOptionPane.showMessageDialog(MainFrame.this, ex.toString(), "Cluster Application", JOptionPane.ERROR_MESSAGE);
                 }
             } else {
                 log.debug("Export cancelled");
             }
         }
     }
-    
+
     public static void main(String args[]) {
         try {
             UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
         } catch (Exception e) {
-            e.printStackTrace();
+            log.error(e, e);
         }
 
         Configuration config = Configuration.getInstance();
@@ -292,7 +287,7 @@ public class MainFrame extends JFrame implements Printable, ActionListener {
         String text = buildTextToPrint();
         log.debug("Text to print:");
         log.debug(text);
-        
+
         String[] line = text.split("\n");
         int y = 15;
         Font f = new Font(Font.SERIF, Font.PLAIN, 12);
@@ -308,7 +303,7 @@ public class MainFrame extends JFrame implements Printable, ActionListener {
 
     private String buildTextToPrint() {
         StringBuilder stringBuilder = new StringBuilder();
-        
+
         // Total score
         stringBuilder.append("Total Score");
         stringBuilder.append(STR_NEW_LINE);
@@ -321,7 +316,7 @@ public class MainFrame extends JFrame implements Printable, ActionListener {
             stringBuilder.append(STR_NEW_LINE);
             num++;
         }
-        
+
         stringBuilder.append(STR_NEW_LINE);
         stringBuilder.append("Rata-rata");
         stringBuilder.append(STR_NEW_LINE);
@@ -334,7 +329,7 @@ public class MainFrame extends JFrame implements Printable, ActionListener {
             stringBuilder.append(STR_NEW_LINE);
             num++;
         }
-        
+
         stringBuilder.append(STR_NEW_LINE);
         stringBuilder.append("Standard Deviasi");
         stringBuilder.append(STR_NEW_LINE);
@@ -347,7 +342,7 @@ public class MainFrame extends JFrame implements Printable, ActionListener {
             stringBuilder.append(STR_NEW_LINE);
             num++;
         }
-        
+
         stringBuilder.append(STR_NEW_LINE);
         stringBuilder.append("Standard Skor Siswa");
         stringBuilder.append(STR_NEW_LINE);
@@ -368,26 +363,26 @@ public class MainFrame extends JFrame implements Printable, ActionListener {
                 num++;
             }
         }
-        
+
         stringBuilder.append(STR_NEW_LINE);
         stringBuilder.append("Euclidean Distance");
         stringBuilder.append(STR_NEW_LINE);
         for (int i = 0; i < listEuclideanDistance.size(); i++) {
-             HashMap mapEuclideanDistanceStudent = (HashMap) listEuclideanDistance.get(i);
-             StudentModel student = (StudentModel) mapEuclideanDistanceStudent.get("student");
-             Object euclideanDistance = mapEuclideanDistanceStudent.get("euclideanDistance");
-             stringBuilder.append(student.getName());
-             stringBuilder.append(": ");
-             stringBuilder.append(euclideanDistance);
-             stringBuilder.append(STR_NEW_LINE);
+            HashMap mapEuclideanDistanceStudent = (HashMap) listEuclideanDistance.get(i);
+            StudentModel student = (StudentModel) mapEuclideanDistanceStudent.get("student");
+            Object euclideanDistance = mapEuclideanDistanceStudent.get("euclideanDistance");
+            stringBuilder.append(student.getName());
+            stringBuilder.append(": ");
+            stringBuilder.append(euclideanDistance);
+            stringBuilder.append(STR_NEW_LINE);
         }
-        
+
         return stringBuilder.toString();
     }
-    
+
     private String buildTextToExport() {
         StringBuilder stringBuilder = new StringBuilder();
-        
+
         // Total score
         stringBuilder.append("Total Score");
         stringBuilder.append(STR_NEW_LINE);
@@ -400,7 +395,7 @@ public class MainFrame extends JFrame implements Printable, ActionListener {
             stringBuilder.append(STR_NEW_LINE);
             num++;
         }
-        
+
         stringBuilder.append(STR_NEW_LINE);
         stringBuilder.append("Rata-rata");
         stringBuilder.append(STR_NEW_LINE);
@@ -413,7 +408,7 @@ public class MainFrame extends JFrame implements Printable, ActionListener {
             stringBuilder.append(STR_NEW_LINE);
             num++;
         }
-        
+
         stringBuilder.append(STR_NEW_LINE);
         stringBuilder.append("Standard Deviasi");
         stringBuilder.append(STR_NEW_LINE);
@@ -426,7 +421,7 @@ public class MainFrame extends JFrame implements Printable, ActionListener {
             stringBuilder.append(STR_NEW_LINE);
             num++;
         }
-        
+
         // Create list of students
         List<StudentModel> listStudents = new ArrayList<StudentModel>();
         for (int i = 0; i < listStandardScoreStudents.size(); i++) {
@@ -461,9 +456,11 @@ public class MainFrame extends JFrame implements Printable, ActionListener {
         stringBuilder.append(STR_COMMA);
         for (int i = 0; i < listStudents.size(); i++) {
             stringBuilder.append(listStudents.get(i).getName());
-            if (i != (listStudents.size() - 1)) stringBuilder.append(STR_COMMA);
+            if (i != (listStudents.size() - 1)) {
+                stringBuilder.append(STR_COMMA);
+            }
         }
-        
+
         stringBuilder.append(STR_NEW_LINE);
         num = 1;
         for (int i = 0; i < mapStandardScoreQuestion.size(); i++) {
@@ -473,28 +470,30 @@ public class MainFrame extends JFrame implements Printable, ActionListener {
             List listStandardScore = (ArrayList) mapStandardScoreQuestion.get(num);
             for (int c = 0; c < listStandardScore.size(); c++) {
                 stringBuilder.append(listStandardScore.get(c));
-                if (c != (listStandardScore.size() - 1)) stringBuilder.append(STR_COMMA);
+                if (c != (listStandardScore.size() - 1)) {
+                    stringBuilder.append(STR_COMMA);
+                }
             }
             stringBuilder.append(STR_NEW_LINE);
             num++;
         }
-        
+
         stringBuilder.append(STR_NEW_LINE);
         stringBuilder.append("Euclidean Distance");
         stringBuilder.append(STR_NEW_LINE);
         for (int i = 0; i < listEuclideanDistance.size(); i++) {
-             HashMap mapEuclideanDistanceStudent = (HashMap) listEuclideanDistance.get(i);
-             StudentModel student = (StudentModel) mapEuclideanDistanceStudent.get("student");
-             Object euclideanDistance = mapEuclideanDistanceStudent.get("euclideanDistance");
-             stringBuilder.append(student.getName());
-             stringBuilder.append(STR_COMMA);
-             stringBuilder.append(euclideanDistance);
-             stringBuilder.append(STR_NEW_LINE);
+            HashMap mapEuclideanDistanceStudent = (HashMap) listEuclideanDistance.get(i);
+            StudentModel student = (StudentModel) mapEuclideanDistanceStudent.get("student");
+            Object euclideanDistance = mapEuclideanDistanceStudent.get("euclideanDistance");
+            stringBuilder.append(student.getName());
+            stringBuilder.append(STR_COMMA);
+            stringBuilder.append(euclideanDistance);
+            stringBuilder.append(STR_NEW_LINE);
         }
-        
+
         return stringBuilder.toString();
     }
-    
+
     private void assignSummaryTextToPanel(PanelTabSummary panel) {
 
         mapHighestValues = cc.getMapHighestValues();
@@ -502,11 +501,7 @@ public class MainFrame extends JFrame implements Printable, ActionListener {
         HashMap mapEuclideanDistance = (HashMap) mapHighestValues.get("highestEuclideanDistance");
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Modus yang diperoleh dari data diatas adalah sebagai berikut:").append("\n")
-            .append("- Scorenya             : ").append(mapHighestValues.get("highestScore")).append("\n")
-            .append("- Rata-rata scorenya   : ").append(mapHighestValues.get("highestMean")).append("\n")
-            .append("- Standart deviasinya  : ").append(mapHighestValues.get("highestDeviation")).append("\n")
-            .append("- Siswa yang nilainya  : ").append(mapEuclideanDistance.get("euclideanDistance")).append(" (").append(((StudentModel) mapEuclideanDistance.get("student")).getName()).append(")");
+        sb.append("Modus yang diperoleh dari data diatas adalah sebagai berikut:").append("\n").append("- Scorenya             : ").append(mapHighestValues.get("highestScore")).append("\n").append("- Rata-rata scorenya   : ").append(mapHighestValues.get("highestMean")).append("\n").append("- Standart deviasinya  : ").append(mapHighestValues.get("highestDeviation")).append("\n").append("- Siswa yang nilainya  : ").append(mapEuclideanDistance.get("euclideanDistance")).append(" (").append(((StudentModel) mapEuclideanDistance.get("student")).getName()).append(")");
 
         JTextArea textAreaSummary = panel.getTextAreaSummary();
         textAreaSummary.setText(sb.toString());
