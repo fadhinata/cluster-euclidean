@@ -70,11 +70,11 @@ public class MainDialog extends JDialog implements ActionListener {
         }
         return dialog;
     }
-    
+
     public void initComponents() {
         // Clear main panel
         getContentPane().removeAll();
-        
+
         JPanel panel = new JPanel();
         panel.setSize(Constants.MAIN_DIALOG_INITIAL_WIDTH, Constants.MAIN_DIALOG_INITIAL_HEIGHT);
         panel.setBorder(BorderFactory.createCompoundBorder(
@@ -175,7 +175,6 @@ public class MainDialog extends JDialog implements ActionListener {
                     }
                 }
             }
-
         });
         panel.add(txtQuestions, constraint);
 
@@ -198,11 +197,11 @@ public class MainDialog extends JDialog implements ActionListener {
         panel.add(panelBtn, constraint);
 
         getContentPane().add(panel, BorderLayout.CENTER);
-        
+
         // Set filter number on input text
         PlainDocument docStudent = (PlainDocument) txtStudents.getDocument();
         docStudent.setDocumentFilter(new IntDocumentFilter());
-        
+
         PlainDocument docQuestion = (PlainDocument) txtQuestions.getDocument();
         docQuestion.setDocumentFilter(new IntDocumentFilter());
     }
@@ -237,12 +236,12 @@ public class MainDialog extends JDialog implements ActionListener {
                 JOptionPane.showMessageDialog(null, "Jumlah siswa harus lebih besar dari nol", "Cluster Application", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            
+
             if (SimpleValidator.isSmallerEqual(numQuestions, 0)) {
                 JOptionPane.showMessageDialog(null, "Jumlah soal harus lebih besar dari nol", "Cluster Application", JOptionPane.ERROR_MESSAGE);
                 return;
             }
-            
+
             Configuration config = Configuration.getInstance();
             config.setNumStudets(numStudents);
             config.setNumQuestions(numQuestions);

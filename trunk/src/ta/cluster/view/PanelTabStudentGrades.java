@@ -17,14 +17,11 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
-import javax.swing.SwingUtilities;
 import javax.swing.text.PlainDocument;
 import org.apache.log4j.Logger;
 import ta.cluster.core.ClusterCalculator;
@@ -47,41 +44,13 @@ public class PanelTabStudentGrades extends JPanel implements ActionListener {
     private DataStore dataStore;
     private JButton btnProcess;
     private JButton btnBack;
-    private JDialog loadingDlg;
-    private ImageIcon loadingIcon;
 
     public PanelTabStudentGrades(Frame frame) {
         this.config = Configuration.getInstance();
         this.dataStore = DataStore.getInstance();
         this.setSize(Constants.MAIN_FRAME_INITIAL_HEIGHT, Constants.MAIN_FRAME_INITIAL_WIDTH);
 
-        loadingDlg = new JDialog(frame, "Cluster Euclidean", true);
-        loadingDlg.setDefaultCloseOperation(JDialog.DO_NOTHING_ON_CLOSE);
-        loadingDlg.setSize(300, 150);
-        loadingDlg.setLocationRelativeTo(frame);
-
-        loadingIcon = new ImageIcon(getClass().getResource("/ta/cluster/resources/loading-message.gif"));
-
         initComponents();
-    }
-
-    private void showLoadingDialog() {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            public void run() {
-                loadingDlg.add(new JLabel(loadingIcon));
-                loadingDlg.setVisible(true);
-            }
-        });
-    }
-
-    private void hideLoadingDialog() {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            public void run() {
-                loadingDlg.setVisible(false);
-            }
-        });
     }
 
     private void initComponents() {
@@ -189,7 +158,7 @@ public class PanelTabStudentGrades extends JPanel implements ActionListener {
 
                 public void run() {
 
-                    showLoadingDialog();
+                    long startTime = System.currentTimeMillis();
 
                     // Get number of textfields, and store the values
                     ArrayList inputValues = new ArrayList();
@@ -214,28 +183,31 @@ public class PanelTabStudentGrades extends JPanel implements ActionListener {
                     int studentIterator = 0;
                     int nextStudent = 0;
                     for (int i = 0; i < inputValues.size(); i++) {
-
-                        if (i == 0) {
-                            // Then it is an input of student name
-                            if (SimpleValidator.containsNumber(inputValues.get(i))) {
-                                JOptionPane.showMessageDialog(null, "Nama tidak boleh mengandung angka");
+                        String input = String.valueOf(inputValues.get(i));
+                        if (i == 0) {   // Then it is an input of student name
+                            if (SimpleValidator.containsNumber(input)) {
+                                JOptionPane.showMessageDialog(null, "Nama tidak boleh mengandung angka (" + input + ")");
                                 return;
                             }
-                            studentModel = new StudentModel(inputValues.get(i) + "");
+                            studentModel = new StudentModel(input);
                             studentIterator++;
                             nextStudent = (numOfQuestion * studentIterator) + studentIterator;
                             listQuestions = new ArrayList<QuestionModel>();
+                            
                         } else {
 
-                            if (i == nextStudent) {
-                                // Then it is an input of student name
-                                studentModel = new StudentModel(inputValues.get(i) + "");
+                            if (i == nextStudent) { // Then it is an input of student name
+                                if (SimpleValidator.containsNumber(input)) {
+                                    JOptionPane.showMessageDialog(null, "Nama tidak boleh mengandung angka (" + input + ")");
+                                    return;
+                                }
+                                studentModel = new StudentModel(input);
                                 studentIterator++;
                                 nextStudent = (numOfQuestion * studentIterator) + studentIterator;
                                 listQuestions = new ArrayList<QuestionModel>();
-                            } else {
-                                // It is an input of question
-                                QuestionModel question = new QuestionModel(questionIterator + 1, Double.valueOf(inputValues.get(i) + ""));
+                                
+                            } else {    // It is an input of question
+                                QuestionModel question = new QuestionModel(questionIterator + 1, Double.valueOf(input));
                                 listQuestions.add(question);
                                 questionIterator++;
                                 if (questionIterator == numOfQuestion) {
@@ -259,7 +231,14 @@ public class PanelTabStudentGrades extends JPanel implements ActionListener {
                     // btnProcess.setText("Processed");
                     // btnProcess.setEnabled(false);
 
-                    hideLoadingDialog();
+                    long endTime = System.currentTimeMillis();
+                    long elapsedTime = endTime - startTime;
+
+                    double seconds = (elapsedTime * 0.001) % 60;
+                    int minutes = (int) ((elapsedTime / (1000 * 60)) % 60);
+                    int hours = (int) ((elapsedTime / (1000 * 60 * 60)) % 24);
+
+                    log.debug("Elapsed: " + hours + " hours, " + minutes + " minutes, " + seconds + " seconds");
                 }
             }).start();
 
